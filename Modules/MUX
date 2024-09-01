@@ -1,0 +1,28 @@
+module MuxForDataMemAndALU(input [7:0] ALUout,DataMem,input enable, output [7:0] alu_datain);
+assign alu_datain=enable?DataMem:ALUout;
+endmodule
+
+module MuxForInstrMemBtwnExtAndMPU(input rst,
+ input instrMem_enableMPU,instrMem_enableExt, output instrMem_enable,
+ input instrMem_RWMPU,instrMem_RWExt,output instrMem_RW,
+input[7:0] instrMem_addressMPU,instrMem_addressExt,output [7:0]instrMem_address,
+input[7:0]dataToInstrMemExt,output[7:0]dataIntoInstrMem);
+
+assign instrMem_enable=rst?instrMem_enableMPU:instrMem_enableExt,
+instrMem_RW=rst?instrMem_RWMPU:instrMem_RWExt, 
+instrMem_address=rst?instrMem_addressMPU:instrMem_addressExt,
+dataIntoInstrMem=rst?8'd255:dataToInstrMemExt;
+endmodule
+
+module MuxForDataMemBtwnExtAndMPU(input rst,
+input dataMem_enableMPU,dataMem_enableExt, output dataMem_enable,
+ input dataMem_RWMPU,dataMem_RWExt,output dataMem_RW,
+                                  input[3:0] dataMem_addressMPU,dataMem_addressExt,output [3:0]dataMem_address,
+input[7:0]dataToDataMemMPU,dataToDataMemExt,output[7:0]dataToDataMem);
+
+assign dataMem_enable=rst?dataMem_enableMPU:dataMem_enableExt,
+dataMem_RW=rst?dataMem_RWMPU:dataMem_RWExt, 
+dataMem_address=rst?dataMem_addressMPU:dataMem_addressExt,
+dataToDataMem=rst?dataToDataMemMPU:dataToDataMemExt;
+
+endmodule

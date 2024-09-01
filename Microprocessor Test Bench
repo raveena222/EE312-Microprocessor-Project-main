@@ -1,0 +1,129 @@
+`timescale 1ns / 1ps
+
+
+module MPUwithMemoryUnit_tb;
+reg rst,clk;
+reg instrMem_enableExt,instrMemRWExt;
+reg [7:0] instrMem_addressExt,dataToInstrMemExt;
+wire [7:0]instrMemDataOut;
+reg dataMem_enableExt, dataMemRWExt;
+reg [3:0] dataMem_addressExt;
+reg [7:0] dataToDataMemExt;
+wire [7:0] dataMemDataOut;
+
+
+
+ 
+
+parameter 
+LD = 4'b0000,
+ST = 4'b0001,
+MR = 4'b0011,
+MI = 4'b0010,
+SUM = 4'b0100,
+SMI = 4'b1100,
+SB = 4'b0101,
+SBI = 4'b1101,
+CM = 4'b0111,
+CMI = 4'b1111,
+ANR = 4'b0110,
+ANI = 4'b1110,
+ORR = 4'b1000,
+ORI = 4'b1001,
+XRR = 4'b1010,
+XRI = 4'b1011,
+A=2'b00,
+B=2'b01,
+C=2'b10,
+D=2'b11;
+
+
+
+MPUwithMemoryUnit     MPU1(rst,clk,
+ instrMem_enableExt,instrMemRWExt,instrMem_addressExt,dataToInstrMemExt,instrMemDataOut,
+ dataMem_enableExt, dataMemRWExt,dataMem_addressExt,dataToDataMemExt,dataMemDataOut );
+ 
+ initial 
+ begin
+ $dumpfile("MPUwithMemoryUnit_tb.vcd");
+$dumpvars(0,MPUwithMemoryUnit_tb);
+    
+   
+ rst=1'b0;
+ clk=1'b0;
+ instrMem_enableExt=1'b0;
+ instrMemRWExt=1'b1;
+ instrMem_addressExt=8'd0;
+ dataToInstrMemExt=8'd0;
+ dataMem_enableExt=1'b0;
+  dataMemRWExt=1'b1;
+  dataMem_addressExt=4'd0;
+  dataToDataMemExt=8'd0;
+  
+   instrMemRWExt=1'b0;
+ // Loading LD instruction
+ #30 instrMem_addressExt=8'd0;
+ dataToInstrMemExt={LD,4'd0};
+  instrMem_enableExt=1'b1;
+ // Disabling External To Instruction Memory
+ #10 instrMem_enableExt=1'b0;
+ // Loading MR instruction
+ #20instrMem_addressExt=8'd1;
+ dataToInstrMemExt={MR,B,A};
+  instrMem_enableExt=1'b1;
+ // Disabling External To Instruction Memory
+ #10 instrMem_enableExt=1'b0;
+ 
+ // Loading SUM instruction
+ #20instrMem_addressExt=8'd2;
+ dataToInstrMemExt={SUM,A,B};
+  instrMem_enableExt=1'b1;
+ // Disabling External To Instruction Memory
+ #10 instrMem_enableExt=1'b0;
+ 
+ // Loading ST instruction
+ #20instrMem_addressExt=8'd3;
+ dataToInstrMemExt={ST,4'd1};
+  instrMem_enableExt=1'b1;
+ // Disabling External To Instruction Memory
+ #10 instrMem_enableExt=1'b0;
+ 
+   
+ #20instrMem_addressExt=8'd4;
+ dataToInstrMemExt=8'd255;
+  instrMem_enableExt=1'b1;
+ #10
+ instrMem_enableExt=1'b0;
+ 
+ #20  dataMemRWExt=1'b0;
+
+  dataMem_addressExt=4'd0;
+  dataToDataMemExt=8'd5;
+  dataMem_enableExt=1'b1;
+
+#10   dataMem_enableExt=1'b0;
+ dataMemRWExt=1'b1;
+
+ #7 rst=1'b1;
+ #300
+  
+  rst=1'b0;
+  dataMem_addressExt=4'd1;
+  dataMem_enableExt=1'b1;
+  #10  dataMem_enableExt=1'b1;
+  #20
+  dataMem_addressExt=4'd0;
+  dataMem_enableExt=1'b1;
+  
+  #20 $finish;
+  
+  
+ 
+ end
+ 
+ 
+ always
+ #5 clk=~clk;
+ 
+
+endmodule

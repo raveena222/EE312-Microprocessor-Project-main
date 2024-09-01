@@ -1,0 +1,56 @@
+module ALU(
+    input [7: 0] Data1,
+    input [7: 0] Data2,
+    input [3: 0] OpCode,
+    output reg [7: 0] OperationResult
+    );
+reg [7: 0] MoveResult;
+reg [7: 0] AddResult;
+reg [7: 0] SubtractResult;
+reg [7: 0] ComplementResult;
+reg [7: 0] AndResult;
+reg [7: 0] OrResult;
+reg [7: 0] XorResult;
+always@(*) begin
+    MoveResult = Data2;
+    AddResult = Data1 + Data2;
+    SubtractResult = Data1 - Data2;
+    ComplementResult = ~ Data2;
+    AndResult = Data1 & Data2;
+    OrResult = Data1 | Data2;
+    XorResult = Data1 ^ Data2;
+  
+    case(OpCode)
+        // Move Register
+        4'b0011: OperationResult = MoveResult;
+        // Move Immediate
+        4'b0010: OperationResult = MoveResult;
+        // Sum Register
+        4'b0100: OperationResult = AddResult;
+        // Sum Immediate
+        4'b1100: OperationResult = AddResult;
+        // Subtract Register
+        4'b0101: OperationResult = SubtractResult;
+        // Subtract Immediate
+        4'b1101: OperationResult = SubtractResult;
+        // Complement Register
+        4'b0111: OperationResult = ComplementResult;
+        // Complement Immediate
+        4'b1111: OperationResult = ComplementResult;
+        // And Register
+        4'b0110: OperationResult = AndResult;
+        // And Immediate
+        4'b1110: OperationResult = AndResult;
+        // Or Register
+        4'b1000: OperationResult = OrResult;
+        // Or Immediate
+        4'b1001: OperationResult = OrResult;
+        // Xor Register
+        4'b1010: OperationResult = XorResult;
+        // Xor Immediate
+        4'b1011: OperationResult = XorResult;
+        // Default
+        default: OperationResult = 8'bz;
+    endcase
+end
+endmodule

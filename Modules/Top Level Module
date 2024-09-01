@@ -1,0 +1,104 @@
+module MPUwithMemoryUnit(input rst,clk,
+input instrMem_enableExt,input instrMemRWExt,input[7:0]instrMem_addressExt,input[7:0]dataToInstrMemExt,output [7:0]instrMemDataOut,
+input dataMem_enableExt,input dataMemRWExt,input[3:0]dataMem_addressExt,input[7:0]dataToDataMemExt,output [7:0]dataMemDataOut
+);
+//Inputs to Instruction Memory, En,RW,ADRESS,Datain
+wire instrMem_enable,instrMem_RW;
+wire [7:0] instrMem_address,dataIntoInstrMem; 
+
+
+//En,RW,ADDRESS to Instruction Memory from MPU. No Data from MPU to Instruction Memory.
+wire MPUenableinstrMem,instrMem_RWMPU;
+wire [7:0]  instrMem_addressMPU;
+
+
+//Inputs to ALU
+wire [3:0]opcode;
+wire [7:0]operand1_dataToDataMemMPU,operand2;
+
+//ALU Output
+wire [7:0]ALUout;
+
+//an Input To MPU, multiplexed with ALU output and Data from Data Memory
+wire [7:0]ALUcumdataMemDataOut;
+
+
+//En,RW,ADDRESS to Data Memory from MPU. Data from MPU to Data Memory is in "operand1_dataToDataMemMPU" which is ALU inputs list
+wire MPUenableDataMem,dataMem_RWMPU;
+wire [3:0]dataMem_addressMPU;
+
+
+//inputs of data Memory,En,RW,ADRESS,Datain
+wire dataMem_enable,dataMem_RW;
+wire [3:0]dataMem_address;
+wire [7:0]dataToDataMem;
+
+
+
+
+MuxForDataMemAndALU        MuxDataALU(ALUout,dataMemDataOut, MPUenableDataMem, ALUcumdataMemDataOut);
+
+
+
+
+
+
+
+
+MuxForInstrMemBtwnExtAndMPU       MuxInstrExtMPU( rst,
+ MPUenableinstrMem,instrMem_enableExt, instrMem_enable,
+  instrMem_RWMPU,instrMemRWExt,instrMem_RW,
+ instrMem_addressMPU,instrMem_addressExt,instrMem_address,
+dataToInstrMemExt,dataIntoInstrMem);
+
+
+
+
+
+
+
+
+MuxForDataMemBtwnExtAndMPU       MuxDataExtMPU(rst,
+MPUenableDataMem,dataMem_enableExt, dataMem_enable,
+ dataMem_RWMPU,dataMemRWExt,dataMem_RW,
+ dataMem_addressMPU,dataMem_addressExt,dataMem_address,
+operand1_dataToDataMemMPU,dataToDataMemExt,dataToDataMem);
+
+
+
+
+controlunit         CU(rst,clk,
+instrMemDataOut, MPUenableinstrMem
+,instrMem_RWMPU, instrMem_addressMPU,
+ALUcumdataMemDataOut, MPUenableDataMem,dataMem_RWMPU,dataMem_addressMPU,
+opcode,operand1_dataToDataMemMPU,operand2);
+
+
+
+
+
+
+ instruction_Memory       InstrMem(instrMem_enable, instrMem_RW, instrMem_address, dataIntoInstrMem, instrMemDataOut);
+ 
+ 
+ 
+ 
+ 
+ 
+ data_Memory     dataMem(dataMem_enable,dataMem_RW,dataMem_address, dataToDataMem, dataMemDataOut);
+ 
+ 
+ 
+ 
+ 
+ 
+ ALU       ALunit(
+     operand1_dataToDataMemMPU,operand2,
+     opcode,
+     ALUout
+    );
+ 
+ 
+ 
+ 
+endmodule
